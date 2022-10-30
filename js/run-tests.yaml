@@ -1,0 +1,27 @@
+name: 'Run Tests'
+
+on:
+  - workflow_call
+env:
+  GITHUB_PACKAGES_TOKEN: ${{ secrets.GH_TOKEN }}
+jobs:
+  run-tests:
+    name: 'Run all tests'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: 'Checkout source code'
+        uses: 'actions/checkout@v3'
+        with:
+          ref: ${{ github.ref }}
+      - name: 'Setup Node.js'
+        uses: 'actions/setup-node@v3'
+        with:
+          node-version: 14
+          cache: 'npm'
+      - name: 'npm install'
+        run: npm ci
+      - name: 'npm build:tsc'
+        run: npm run build:tsc --if-present
+      - name: 'npm run test'
+        run: npm run test
