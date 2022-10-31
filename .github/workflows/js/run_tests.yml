@@ -1,9 +1,16 @@
 name: 'Run Tests'
 
 on:
-  - workflow_call
+  workflow_call:
+    inputs:
+      node-version:
+        description: 'node version to use'
+        type: string
+        default: '14'
+
+  
 env:
-  GITHUB_PACKAGES_TOKEN: ${{ secrets.GH_TOKEN }}
+  GITHUB_PACKAGES_TOKEN: ${{ secrets.RETRAIN_PACKAGES_TOKEN }}
 jobs:
   run-tests:
     name: 'Run all tests'
@@ -17,11 +24,11 @@ jobs:
       - name: 'Setup Node.js'
         uses: 'actions/setup-node@v3'
         with:
-          node-version: 14
+          node-version: ${{ inputs.node-version }}
           cache: 'npm'
       - name: 'npm install'
         run: npm ci
-      - name: 'npm build:tsc'
+      - name: 'build typescript'
         run: npm run build:tsc --if-present
       - name: 'npm run test'
         run: npm run test
