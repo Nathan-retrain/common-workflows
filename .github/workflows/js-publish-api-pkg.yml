@@ -1,0 +1,43 @@
+name: 'Publish API'
+
+on:
+  workflow_call:
+    inputs:
+      node-version:
+        description: 'node version to use'
+        type: string
+        default: '14'
+
+  
+env:
+  GITHUB_PACKAGES_TOKEN: ${{ secrets.RETRAIN_PACKAGES_TOKEN }}
+jobs:
+  publish-api:
+    name: 'Publish API'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: 'Checkout source code'
+        uses: 'actions/checkout@v3'
+        with:
+          ref: ${{ github.ref }}
+      - name: 'Setup Node.js'
+        uses: 'actions/setup-node@v3'
+        with:
+          node-version: ${{ inputs.node-version }}
+          cache: 'npm'
+      - name: 'npm install'
+        run: npm ci
+      - name: 'Checkout api generator'
+        uses: 'actions/checkout@v3'
+        with:
+          repository: retrain-ai/api-generator
+          ssh-key: ${{ secrets.API_GENERATOR_KEY }}
+          path: 'api-generator'
+      - name: 'npm install for api-generator'
+        run: |
+          cd 'api-generator' 
+          npm ci
+          cd ..
+      - name: 'run api generator'
+        run: 'node api-generator/index.js'
