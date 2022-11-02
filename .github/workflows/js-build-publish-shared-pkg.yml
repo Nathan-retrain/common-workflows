@@ -1,0 +1,42 @@
+name: 'Build and publish Pkg'
+
+on:
+  workflow_call:
+    inputs:
+      node-version:
+        description: 'node version to use'
+        type: string
+        default: '14'
+      auto-bump-version:
+        description: 'auto bump version'
+        type: boolean
+        default: true
+      
+env:
+  GITHUB_PACKAGES_TOKEN: ${{ secrets.RETRAIN_PACKAGES_TOKEN }}
+jobs:
+  build:
+    name: 'Build npm package'
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-node@v3
+      with:
+        node-version: '14'
+        registry-url: 'https://npm.pkg.github.com'
+        cache: 'npm'
+        scope: '@retrain-ai'
+    - run: npm install
+    - run: npm run test
+    - run: npm run build
+    - name: bump version
+      if: ${{ inputs.auto-bump-version }}
+      uses: retrain-ai/version-tagger@main
+      with:
+        tag: true
+        write: true
+        commit: false
+        token: ${{ secrets.RETRAIN_PACKAGES_TOKEN }}
+    - run: npm publish
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.RETRAIN_PACKAGES_TOKEN }}
