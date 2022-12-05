@@ -1,4 +1,4 @@
-name: 'Run Tests'
+name: 'JS shared base'
 
 on:
   workflow_call:
@@ -13,17 +13,19 @@ env:
   GITHUB_PACKAGES_TOKEN: ${{ secrets.RETRAIN_PACKAGES_TOKEN }}
   CI: true
 jobs:
-  run-tests:
-    name: 'Run all tests'
+  build:
+    name: 'Checkout and install deps'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - name: 'Checkout and deps'
-        uses: 'retrain-ai/common-workflows/.github/workflows/js-base.yml'
-        secrets: inherit
+      - name: 'Checkout source code'
+        uses: 'actions/checkout@v3'
+        with:
+          ref: ${{ github.ref }}
+      - name: 'Setup Node.js'
+        uses: 'actions/setup-node@v3'
         with:
           node-version: ${{ inputs.node-version }}
-      - name: 'build typescript'
-        run: npm run build:tsc --if-present
-      - name: 'npm run test'
-        run: npm run test
+          cache: 'npm'
+      - name: 'npm install'
+        run: npm ci
