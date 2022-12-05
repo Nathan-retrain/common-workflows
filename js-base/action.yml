@@ -1,0 +1,32 @@
+inputs:
+  node-version:
+    description: 'node version to use'
+    type: string
+    default: '14'
+  package-token:
+    description: 'token to use for publishing'
+    type: string
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: 'Checkout source code'
+      uses: 'actions/checkout@v3'
+      with:
+        ref: ${{ github.ref }}
+        path: 'project'
+    - name: 'Setup Node.js'
+      uses: 'actions/setup-node@v3'
+      with:
+        node-version: ${{ inputs.node-version }}
+        cache: 'npm'
+        cache-dependency-path: src/package-lock.json
+      cache: 'npm'
+    - name: 'npm install'
+      working-directory: ./src
+      run: npm ci
+      shell: bash
+      env:
+        GITHUB_PACKAGES_TOKEN: ${{ inputs.package-token }}
+        CI: true

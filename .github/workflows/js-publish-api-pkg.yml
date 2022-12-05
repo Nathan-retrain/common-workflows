@@ -7,10 +7,25 @@ on:
         description: 'node version to use'
         type: string
         default: '14'
+      skip-validation:
+        description: 'skip validation'
+        type: boolean
+        default: false
+      use-object-parameters:
+        description: 'use object parameters'
+        type: boolean
+        default: true
+      generator-type:
+        description: 'generator type'
+        type: string
+        default: 'typescript-axios'
 
   
 env:
   GITHUB_PACKAGES_TOKEN: ${{ secrets.RETRAIN_PACKAGES_TOKEN }}
+  SKIP_VALIDATION: ${{ inputs.skip-validation }}}
+  USE_OBJECT_PARAMETERS: ${{ inputs.use-object-parameters }}}
+  GENERATOR_TYPE: ${{ inputs.generator-type }}
 jobs:
   publish-api:
     name: 'Publish API'

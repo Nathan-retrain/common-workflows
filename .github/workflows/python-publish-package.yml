@@ -28,4 +28,4 @@ jobs:
         - name: Build and publish
           run: |
             python setup.py sdist bdist_wheel
-            twine upload --verbose --repository-url https://europe-west4-python.pkg.dev/retrain-utils/retrain-pypi/ dist/*
+            twine upload --skip-existing --verbose --repository-url https://europe-west4-python.pkg.dev/retrain-utils/retrain-pypi/ dist/* || /usr/bin/true

@@ -10,20 +10,53 @@ on:
 
   
 env:
-  GITHUB_PACKAGES_TOKEN: ${{ secrets.RETRAIN_PACKAGES_TOKEN }}
   CI: true
+  GITHUB_PACKAGES_TOKEN: ${{ secrets.RETRAIN_PACKAGES_TOKEN }}
 jobs:
   run-tests:
     name: 'Run all tests'
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    if: ${{ ! github.event.pull_request.draft }}
     steps:
-      - name: 'Checkout and deps'
-        uses: 'retrain-ai/common-workflows/.github/workflows/js-base.yml'
-        secrets: inherit
+      - name: 'Checkout source code'
+        uses: 'actions/checkout@v3'
+        with:
+          ref: ${{ github.ref }}
+      - name: 'Setup Node.js'
+        uses: 'actions/setup-node@v3'
         with:
           node-version: ${{ inputs.node-version }}
+          cache: 'npm'
+      - name: 'npm install'
+        run: npm ci
       - name: 'build typescript'
         run: npm run build:tsc --if-present
-      - name: 'npm run test'
-        run: npm run test
+      - name: 'run jest'
+        run: npm run test:coverage-report
+      - name: 'download main branch coverage'
+        uses: dawidd6/action-download-artifact@e6e25ac3a2b93187502a8be1ef9e9603afc34925
+        with:
+          commit: ${{github.event.pull_request.base.sha}}
+          workflow: build.yaml
+          workflow_conclusion: ""
+          name: report-main.json
+          if_no_artifact_found: warn
+        continue-on-error: true
+      - name : 'handle base coverage not existing'
+        run: |
+          if [ ! -f report-main.json ]; then
+            echo "No base coverage found, using current coverage as base"
+            cp report.json report-main.json
+          fi
+      - uses: ArtiomTr/jest-coverage-report-action@9f733792c44d05327cb371766bf78a5261e43936
+        id: coverage
+        with:
+          skip-step: install
+          output: report-markdown
+          coverage-file: report.json
+          base-coverage-file: report.json
+      - uses: marocchino/sticky-pull-request-comment@fcf6fe9e4a0409cd9316a5011435be0f3327f1e1
+        with:
+            message: ${{ steps.coverage.outputs.report }}
+        
