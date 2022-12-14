@@ -55,7 +55,7 @@ jobs:
           skip-step: install
           output: report-markdown
           coverage-file: report.json
-          base-coverage-file: report.json
+          base-coverage-file: report-main.json
       - uses: marocchino/sticky-pull-request-comment@fcf6fe9e4a0409cd9316a5011435be0f3327f1e1
         with:
             message: ${{ steps.coverage.outputs.report }}
