@@ -1,0 +1,53 @@
+name: 'Publish a client deployable'
+on:
+  workflow_call:
+    inputs:
+      node-version:
+        description: 'node version to use'
+        type: string
+        default: '14'
+        
+env:
+  GITHUB_PACKAGES_TOKEN: ${{ secrets.RETRAIN_PACKAGES_TOKEN }}
+
+jobs:
+  build:
+    name: 'build'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: 'Checkout source code'
+        uses: 'actions/checkout@v3'
+        with:
+          ref: ${{ github.ref }}
+      - name: 'Setup Node.js'
+        uses: 'actions/setup-node@v3'
+        with:
+          node-version: ${{ inputs.node-version }}
+          cache: 'npm'
+      - name: 'npm install'
+        run: npm ci
+      # - name: 'npm build storybook'
+      #   run: 'npm run build-storybook'
+      # - name: 'publish story book'
+      #   uses: dswistowski/surge-sh-action@c09463ed5222f67391260fa806240d4e464743d0
+      #   with:
+      #     domain: 'rtr-ai.surge.sh'
+      #     project: './storybook-static'
+      #     login: ${{ secrets.surge_login }}
+      #     token: ${{ secrets.surge_token }}
+      # - name: 'publish story book chromatic'
+      #   run: npx chromatic --project-token=${{ secrets.CHROMATIC_TOKEN }}
+      - name: 'npm run build:tsc'
+        run: npm run build:tsc
+      - name: 'npm run build'
+        run: CI=false npm run build
+      - name: Create Sentry release
+        uses: getsentry/action-release@v1
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: retrainai-nh
+          SENTRY_PROJECT: sofi
+        with:
+          sourcemaps: build/static/js
+          version: main_${{ github.sha }}
