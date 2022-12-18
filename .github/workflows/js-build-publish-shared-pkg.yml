@@ -22,12 +22,11 @@ jobs:
     - uses: actions/checkout@v3
     - uses: actions/setup-node@v3
       with:
-        node-version: '14'
+        node-version: ${{ inputs.node-version }}
         registry-url: 'https://npm.pkg.github.com'
         cache: 'npm'
         scope: '@retrain-ai'
-    - run: npm install
-    - run: npm run test
+    - run: npm ci
     - run: npm run build
     - name: bump version
       if: ${{ inputs.auto-bump-version }}

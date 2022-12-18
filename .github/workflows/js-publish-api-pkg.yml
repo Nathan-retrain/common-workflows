@@ -19,6 +19,14 @@ on:
         description: 'generator type'
         type: string
         default: 'typescript-axios'
+      port:
+        description: 'port'
+        type: string
+        default: '3000'
+      health-endpoint:
+        description: 'health endpoint'
+        type: string
+        default: '/api/health/is-alive'
 
   
 env:
@@ -26,6 +34,8 @@ env:
   SKIP_VALIDATION: ${{ inputs.skip-validation }}}
   USE_OBJECT_PARAMETERS: ${{ inputs.use-object-parameters }}}
   GENERATOR_TYPE: ${{ inputs.generator-type }}
+  PORT: ${{ inputs.port }}
+  HEALTH_ENDPOINT: ${{ inputs.health-endpoint }}
 jobs:
   publish-api:
     name: 'Publish API'
