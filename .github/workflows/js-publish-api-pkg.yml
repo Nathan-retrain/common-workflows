@@ -27,6 +27,10 @@ on:
         description: 'health endpoint'
         type: string
         default: '/api/health/is-alive'
+      extra-args:
+        description: 'extra args'
+        type: string
+        default: ''
 
   
 env:
@@ -36,6 +40,7 @@ env:
   GENERATOR_TYPE: ${{ inputs.generator-type }}
   PORT: ${{ inputs.port }}
   HEALTH_ENDPOINT: ${{ inputs.health-endpoint }}
+  USE_MOCK_DB: true
 jobs:
   publish-api:
     name: 'Publish API'
