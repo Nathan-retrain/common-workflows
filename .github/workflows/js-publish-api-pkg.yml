@@ -35,8 +35,8 @@ on:
   
 env:
   GITHUB_PACKAGES_TOKEN: ${{ secrets.RETRAIN_PACKAGES_TOKEN }}
-  SKIP_VALIDATION: ${{ inputs.skip-validation }}}
-  USE_OBJECT_PARAMETERS: ${{ inputs.use-object-parameters }}}
+  SKIP_VALIDATION: ${{ inputs.skip-validation }}
+  USE_OBJECT_PARAMETERS: ${{ inputs.use-object-parameters }}
   GENERATOR_TYPE: ${{ inputs.generator-type }}
   PORT: ${{ inputs.port }}
   HEALTH_ENDPOINT: ${{ inputs.health-endpoint }}
